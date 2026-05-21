@@ -1,41 +1,120 @@
+<?php
+require_once 'includes/auth.php';
+startSession();
+if (isLoggedIn()) {
+    redirectToDashboard($_SESSION['role']);
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EVSU-OC INC Form Portal</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .bg-maroon { background-color: #800000; }
-        .text-maroon { color: #800000; }
-        .border-maroon { border-color: #800000; }
-        .hover-gold:hover { background-color: #FFD700; color: #222222; }
-    </style>
+    <title>EVSU-OC INC Form System</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="bg-[#FBFBFB] min-h-screen flex flex-col justify-center items-center font-sans px-4">
-    <div class="text-center mb-10">
-        <h1 class="text-3xl font-bold text-maroon uppercase tracking-wide">EVSU - Ormoc Campus</h1>
-        <p class="text-gray-500 mt-2 text-sm tracking-widest">INC APPLICATION & RESOLUTION WORKFLOW SYSTEM</p>
-    </div>
+<body>
+<div class="landing-bg">
+    <div class="landing-card">
+        <div class="landing-logo">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+        </div>
+        <div class="landing-title">EVSU-OC INC Form System</div>
+        <div class="landing-sub">Eastern Visayas State University – Ormoc Campus</div>
 
-    <div class="grid md:grid-cols-2 gap-8 w-full max-w-4xl">
-        <a href="login.php?portal=student" class="bg-white border border-gray-100 rounded-lg p-8 text-center shadow-sm hover:shadow-md transition duration-300 flex flex-col justify-between items-center group">
-            <div class="p-4 bg-gray-50 rounded-full mb-4 group-hover:bg-red-50 transition">
-                <svg class="w-12 h-12 text-maroon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+        <div id="roleSelect">
+            <p style="font-size:0.92rem;color:#444;margin-bottom:20px;">Who are you?</p>
+            <div class="role-cards">
+                <div class="role-card" onclick="showLogin('student')">
+                    <div class="role-card-icon">
+                        <svg viewBox="0 0 24 24" stroke-width="2" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422A12 12 0 0112 21a12 12 0 01-6.16-10.422L12 14z"/>
+                        </svg>
+                    </div>
+                    <div class="role-card-label">Student</div>
+                    <div class="role-card-desc">File INC applications</div>
+                </div>
+                <div class="role-card" onclick="showLogin('employee')">
+                    <div class="role-card-icon">
+                        <svg viewBox="0 0 24 24" stroke-width="2" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a4 4 0 00-5.916-3.517M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a4 4 0 015.916-3.517M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                    </div>
+                    <div class="role-card-label">Employee</div>
+                    <div class="role-card-desc">Admin, Registrar, Instructor, Dept. Head</div>
+                </div>
             </div>
-            <h2 class="text-xl font-bold text-gray-800 mb-2">Student Portal</h2>
-            <p class="text-gray-400 text-sm mb-6">File digital INC submissions, manage payments, and view grades real-time.</p>
-            <span class="w-full py-2.5 rounded text-white bg-maroon font-semibold hover-gold text-center transition">Access Student Login</span>
-        </a>
+        </div>
 
-        <a href="login.php?portal=employee" class="bg-white border border-gray-100 rounded-lg p-8 text-center shadow-sm hover:shadow-md transition duration-300 flex flex-col justify-between items-center group">
-            <div class="p-4 bg-gray-50 rounded-full mb-4 group-hover:bg-red-50 transition">
-                <svg class="w-12 h-12 text-maroon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-            </div>
-            <h2 class="text-xl font-bold text-gray-800 mb-2">Employee Portal</h2>
-            <p class="text-gray-400 text-sm mb-6">For Registrar, Department Heads, and Instructors processing clearance tracks.</p>
-            <span class="w-full py-2.5 rounded text-white bg-maroon font-semibold hover-gold text-center transition">Access Employee Login</span>
-        </a>
+        <div id="studentLogin" style="display:none;">
+            <button class="back-link" onclick="showRoleSelect()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                Back
+            </button>
+            <div class="landing-title" style="font-size:1.1rem;margin-bottom:4px;">Student Login</div>
+            <div class="landing-sub" style="margin-bottom:20px;">Enter your student credentials</div>
+            <?php if (isset($_GET['error']) && $_GET['login'] === 'student'): ?>
+                <div class="alert alert-error"><?= htmlspecialchars($_GET['error']) ?></div>
+            <?php endif; ?>
+            <?php if (isset($_GET['timeout'])): ?>
+                <div class="alert alert-info">Session expired. Please log in again.</div>
+            <?php endif; ?>
+            <form class="login-form" method="POST" action="login.php">
+                <input type="hidden" name="login_type" value="student">
+                <div class="form-group">
+                    <label for="student_id">Student ID</label>
+                    <input type="text" id="student_id" name="student_id" class="form-control" placeholder="e.g. 2024-0001" required autofocus>
+                </div>
+                <div class="form-group">
+                    <label for="student_pass">Password</label>
+                    <input type="password" id="student_pass" name="password" class="form-control" placeholder="Enter your password" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Log In</button>
+            </form>
+        </div>
+
+        <div id="employeeLogin" style="display:none;">
+            <button class="back-link" onclick="showRoleSelect()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                Back
+            </button>
+            <div class="landing-title" style="font-size:1.1rem;margin-bottom:4px;">Employee Login</div>
+            <div class="landing-sub" style="margin-bottom:20px;">Enter your employee credentials</div>
+            <?php if (isset($_GET['error']) && $_GET['login'] === 'employee'): ?>
+                <div class="alert alert-error"><?= htmlspecialchars($_GET['error']) ?></div>
+            <?php endif; ?>
+            <form class="login-form" method="POST" action="login.php">
+                <input type="hidden" name="login_type" value="employee">
+                <div class="form-group">
+                    <label for="emp_username">Username</label>
+                    <input type="text" id="emp_username" name="username" class="form-control" placeholder="Enter your username" required autofocus>
+                </div>
+                <div class="form-group">
+                    <label for="emp_pass">Password</label>
+                    <input type="password" id="emp_pass" name="password" class="form-control" placeholder="Enter your password" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Log In</button>
+            </form>
+        </div>
     </div>
+</div>
+<script>
+function showRoleSelect() {
+    document.getElementById('roleSelect').style.display = '';
+    document.getElementById('studentLogin').style.display = 'none';
+    document.getElementById('employeeLogin').style.display = 'none';
+}
+function showLogin(type) {
+    document.getElementById('roleSelect').style.display = 'none';
+    document.getElementById('studentLogin').style.display = type === 'student' ? '' : 'none';
+    document.getElementById('employeeLogin').style.display = type === 'employee' ? '' : 'none';
+}
+<?php if (isset($_GET['login'])): ?>
+showLogin('<?= htmlspecialchars($_GET['login']) ?>');
+<?php endif; ?>
+</script>
 </body>
 </html>
