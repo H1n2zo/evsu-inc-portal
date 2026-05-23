@@ -55,7 +55,7 @@ include __DIR__ . '/../includes/head.php';
         <option value="student" <?= $role==='student'?'selected':'' ?>>Student</option>
       </select>
       <button type="submit" class="btn-sm maroon">Filter</button>
-      <a href="/evsu_inc_portal/admin/logs.php" class="btn-sm">Clear</a>
+      <a href="/admin/logs.php" class="btn-sm">Clear</a>
       <span style="margin-left:auto;font-size:12px;color:var(--gray-400);"><?= number_format($total) ?> entries</span>
     </div>
   </form>

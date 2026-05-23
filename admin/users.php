@@ -106,7 +106,7 @@ include __DIR__ . '/../includes/head.php';
       <h2>Users &amp; Roles</h2>
       <p>Manage accounts and multi-role assignments (RBAC)</p>
     </div>
-    <a href="/evsu_inc_portal/register.php?type=employee" class="btn-sm maroon">+ Add Employee</a>
+    <a href="/register.php?type=employee" class="btn-sm maroon">+ Add Employee</a>
   </div>
 
   <?php if ($msg): ?><div class="alert alert-success"><?= h($msg) ?></div><?php endif; ?>
@@ -125,7 +125,7 @@ include __DIR__ . '/../includes/head.php';
         <option value="student" <?= $roleFilter==='student'?'selected':'' ?>>Student</option>
       </select>
       <button type="submit" class="btn-sm maroon">Filter</button>
-      <a href="/evsu_inc_portal/admin/users.php" class="btn-sm">Clear</a>
+      <a href="/admin/users.php" class="btn-sm">Clear</a>
     </div>
   </form>
 
@@ -192,7 +192,7 @@ include __DIR__ . '/../includes/head.php';
                 <?php if ($u['account_type'] === 'employee'): ?>
                 <button class="btn-sm" onclick="openRoleModal(<?= $u['id'] ?>, '<?= h(addslashes($u['full_name'])) ?>', '<?= h($u['roles'] ?? '') ?>')">Edit Roles</button>
                 <?php else: ?>
-                <a href="/evsu_inc_portal/admin/user_view.php?id=<?= $u['id'] ?>" class="btn-sm">View</a>
+                <a href="/admin/user_view.php?id=<?= $u['id'] ?>" class="btn-sm">View</a>
                 <?php endif; ?>
                 <?php if ($u['account_type'] !== 'admin'): ?>
                   <?php if ($u['status'] === 'active'): ?>

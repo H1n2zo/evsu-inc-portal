@@ -4,9 +4,9 @@ require_once __DIR__ . '/includes/auth.php';
 // If already logged in, redirect to appropriate dashboard
 if (!empty($_SESSION['user_id'])) {
     $type = $_SESSION['account_type'];
-    if ($type === 'admin') header('Location: /evsu_inc_portal/admin/dashboard.php');
-    elseif ($type === 'employee') header('Location: /evsu_inc_portal/employee/dashboard.php');
-    else header('Location: /evsu_inc_portal/student/dashboard.php');
+    if ($type === 'admin') header('Location: /admin/dashboard.php');
+    elseif ($type === 'employee') header('Location: /employee/dashboard.php');
+    else header('Location: /student/dashboard.php');
     exit;
 }
 
@@ -37,13 +37,13 @@ include __DIR__ . '/includes/head.php';
     <p class="hero-sub">Digital processing for INC form submissions — faster, paperless, and fully trackable.</p>
 
     <div class="role-cards">
-      <a href="/evsu_inc_portal/login.php?type=student" class="role-card student">
+      <a href="/login.php?type=student" class="role-card student">
         <div class="icon-wrap">🎓</div>
         <h3>Student</h3>
         <p>File INC applications, upload receipts, and track your progress.</p>
         <span class="cta">Sign in as Student →</span>
       </a>
-      <a href="/evsu_inc_portal/login.php?type=employee" class="role-card employee">
+      <a href="/login.php?type=employee" class="role-card employee">
         <div class="icon-wrap">💼</div>
         <h3>Employee / Admin</h3>
         <p>Instructor · Department Head · Registrar · Administrator</p>

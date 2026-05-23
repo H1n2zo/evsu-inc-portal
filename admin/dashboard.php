@@ -39,7 +39,7 @@ include __DIR__ . '/../includes/head.php';
 
   <?php if ($pendingUsers > 0): ?>
   <div class="alert alert-gold">
-    ⚠ <strong><?= $pendingUsers ?> pending account<?= $pendingUsers > 1 ? 's' : '' ?></strong> require your approval. <a href="/evsu_inc_portal/admin/users.php?filter=pending" style="color:inherit;font-weight:600;">Review now →</a>
+    ⚠ <strong><?= $pendingUsers ?> pending account<?= $pendingUsers > 1 ? 's' : '' ?></strong> require your approval. <a href="/admin/users.php?filter=pending" style="color:inherit;font-weight:600;">Review now →</a>
   </div>
   <?php endif; ?>
 
@@ -69,7 +69,7 @@ include __DIR__ . '/../includes/head.php';
   <div class="content-card">
     <div class="card-head">
       <h3>Recent Applications</h3>
-      <a href="/evsu_inc_portal/admin/applications.php" class="btn-sm">View all</a>
+      <a href="/admin/applications.php" class="btn-sm">View all</a>
     </div>
     <div class="card-body" style="padding:0">
       <?php if (empty($recent)): ?>

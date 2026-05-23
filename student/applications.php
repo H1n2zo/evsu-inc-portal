@@ -2,7 +2,7 @@
 // student/applications.php
 require_once __DIR__ . '/../includes/auth.php';
 requireLogin();
-if ($_SESSION['account_type'] !== 'student') { header('Location: /evsu_inc_portal/index.php'); exit; }
+if ($_SESSION['account_type'] !== 'student') { header('Location: /index.php'); exit; }
 
 $pdo = getDB();
 $uid = $_SESSION['user_id'];
@@ -25,7 +25,7 @@ include __DIR__ . '/../includes/head.php';
 <main class="main-content">
   <div class="top-bar">
     <div><h2>My Applications</h2><p>All your INC completion requests</p></div>
-    <a href="/evsu_inc_portal/student/apply.php" class="btn-primary" style="height:36px;">+ New Application</a>
+    <a href="/student/apply.php" class="btn-primary" style="height:36px;">+ New Application</a>
   </div>
 
   <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem;">
@@ -38,7 +38,7 @@ include __DIR__ . '/../includes/head.php';
     <div class="card-body" style="padding:0;">
       <?php if (empty($apps)): ?>
         <div class="empty-state">
-          <p>No applications found. <a href="/evsu_inc_portal/student/apply.php" style="color:var(--maroon);">File your first application →</a></p>
+          <p>No applications found. <a href="/student/apply.php" style="color:var(--maroon);">File your first application →</a></p>
         </div>
       <?php else: ?>
       <table class="data-table">
@@ -60,9 +60,9 @@ include __DIR__ . '/../includes/head.php';
           <td style="color:var(--gray-400);font-size:12px;"><?= date('M d, Y', strtotime($a['created_at'])) ?></td>
           <td>
             <?php if ($a['current_step']==4 && $a['status']==='pending_payment'): ?>
-            <a href="/evsu_inc_portal/student/application_view.php?id=<?= $a['id'] ?>" class="btn-sm maroon">Upload Receipt</a>
+            <a href="/student/application_view.php?id=<?= $a['id'] ?>" class="btn-sm maroon">Upload Receipt</a>
             <?php else: ?>
-            <a href="/evsu_inc_portal/student/application_view.php?id=<?= $a['id'] ?>" class="btn-sm">View</a>
+            <a href="/student/application_view.php?id=<?= $a['id'] ?>" class="btn-sm">View</a>
             <?php endif; ?>
           </td>
         </tr>

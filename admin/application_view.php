@@ -15,7 +15,7 @@ $stmt = $pdo->prepare("SELECT a.*, u.full_name, u.username, u.email, u.student_i
     WHERE a.id=?");
 $stmt->execute([$appId]);
 $app = $stmt->fetch();
-if (!$app) { header('Location: /evsu_inc_portal/admin/applications.php'); exit; }
+if (!$app) { header('Location: /admin/applications.php'); exit; }
 
 $stepLabels=[1=>'Student Filing',2=>'Instructor Input',3=>'Dept. Head Review',4=>'Payment Upload',5=>'Registrar Verify',6=>'Grade Posting',7=>'Resolved'];
 $activePage='applications'; $pageTitle='Application '.$app['app_code'];
@@ -36,7 +36,7 @@ include __DIR__ . '/../includes/head.php';
     ?>
     <div style="display:flex;align-items:center;gap:0.75rem;">
       <span class="badge <?= $bm[$app['status']]??'badge-gray' ?>"><?= $lm[$app['status']]??ucfirst($app['status']) ?></span>
-      <a href="/evsu_inc_portal/admin/applications.php" class="btn-sm">← Back</a>
+      <a href="/admin/applications.php" class="btn-sm">← Back</a>
     </div>
   </div>
 
@@ -94,7 +94,7 @@ include __DIR__ . '/../includes/head.php';
           <div style="margin-bottom:4px;"><span class="role-chip rc-student">Student Payment</span></div>
           <?php if($app['or_number']): ?>
           <div>O.R. No.: <strong><?= h($app['or_number']) ?></strong></div>
-          <?php if($app['receipt_filename']): ?><a href="/evsu_inc_portal/assets/uploads/<?= h($app['receipt_filename']) ?>" target="_blank" class="btn-sm" style="margin-top:6px;">View Receipt</a><?php endif; ?>
+          <?php if($app['receipt_filename']): ?><a href="/assets/uploads/<?= h($app['receipt_filename']) ?>" target="_blank" class="btn-sm" style="margin-top:6px;">View Receipt</a><?php endif; ?>
           <?php else: ?><span style="color:var(--gray-400);font-size:12px;">No payment uploaded yet</span><?php endif; ?>
         </div>
         <!-- Registrar -->

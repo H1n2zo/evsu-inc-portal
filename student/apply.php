@@ -2,7 +2,7 @@
 // student/apply.php — File new INC application
 require_once __DIR__ . '/../includes/auth.php';
 requireLogin();
-if ($_SESSION['account_type'] !== 'student') { header('Location: /evsu_inc_portal/index.php'); exit; }
+if ($_SESSION['account_type'] !== 'student') { header('Location: /index.php'); exit; }
 
 // Check module enabled
 $pdo = getDB();
@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                            $instructor_id ?: null, $dept_head_id ?: null]);
             $newId = $pdo->lastInsertId();
             auditLog($uid, $_SESSION['username'], 'student', 'Application Filed', "App $app_code — $subject_code", $_SERVER['REMOTE_ADDR']??'');
-            header("Location: /evsu_inc_portal/student/application_view.php?id=$newId&filed=1");
+            header("Location: /student/application_view.php?id=$newId&filed=1");
             exit;
         }
     }
@@ -153,7 +153,7 @@ include __DIR__ . '/../includes/head.php';
 
         <div style="display:flex;gap:0.75rem;">
           <button type="submit" class="btn-primary">Submit Application</button>
-          <a href="/evsu_inc_portal/student/dashboard.php" class="btn-sm" style="height:42px;padding:0 1.25rem;">Cancel</a>
+          <a href="/student/dashboard.php" class="btn-sm" style="height:42px;padding:0 1.25rem;">Cancel</a>
         </div>
       </form>
     </div>

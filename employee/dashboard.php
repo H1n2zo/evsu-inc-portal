@@ -86,7 +86,7 @@ include __DIR__ . '/../includes/head.php';
   <div class="content-card">
     <div class="card-head">
       <h3>Recent Applications <?= $activeRole !== 'registrar' ? 'Assigned to Me' : 'Pending Action' ?></h3>
-      <a href="/evsu_inc_portal/employee/applications.php" class="btn-sm">View all</a>
+      <a href="/employee/applications.php" class="btn-sm">View all</a>
     </div>
     <div class="card-body" style="padding:0;">
       <?php if (empty($recent)): ?>

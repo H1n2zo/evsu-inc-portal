@@ -21,7 +21,7 @@ function checkSessionTimeout(): void {
     $timeout = (int)(getSetting('session_timeout') ?? 30) * 60;
     if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout) {
         logout();
-        header('Location: /evsu_inc_portal/index.php?expired=1');
+        header('Location: /index.php?expired=1');
         exit;
     }
     $_SESSION['last_activity'] = time();
@@ -30,7 +30,7 @@ function checkSessionTimeout(): void {
 // ─────────────────────────────────────────────
 // Auth guards
 // ─────────────────────────────────────────────
-function requireLogin(string $redirect = '/evsu_inc_portal/index.php'): void {
+function requireLogin(string $redirect = '/index.php'): void {
     checkSessionTimeout();
     if (empty($_SESSION['user_id'])) {
         header('Location: ' . $redirect);

@@ -2,7 +2,7 @@
 // student/application_view.php
 require_once __DIR__ . '/../includes/auth.php';
 requireLogin();
-if ($_SESSION['account_type'] !== 'student') { header('Location: /evsu_inc_portal/index.php'); exit; }
+if ($_SESSION['account_type'] !== 'student') { header('Location: /index.php'); exit; }
 
 $pdo   = getDB();
 $uid   = $_SESSION['user_id'];
@@ -18,7 +18,7 @@ $stmt = $pdo->prepare("SELECT a.*, u.full_name, inst.full_name as instructor_nam
     WHERE a.id=? AND a.student_id=?");
 $stmt->execute([$appId, $uid]);
 $app = $stmt->fetch();
-if (!$app) { header('Location: /evsu_inc_portal/student/applications.php'); exit; }
+if (!$app) { header('Location: /student/applications.php'); exit; }
 
 // Handle receipt upload (Step 4)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -185,7 +185,7 @@ include __DIR__ . '/../includes/head.php';
     <div class="card-head"><h3>Payment Receipt</h3><span class="badge badge-success">Uploaded</span></div>
     <div class="card-body">
       <p style="font-size:13.5px;margin-bottom:0.75rem;">O.R. No.: <strong><?= h($app['or_number']??'—') ?></strong></p>
-      <a href="/evsu_inc_portal/assets/uploads/<?= h($app['receipt_filename']) ?>" target="_blank" class="btn-sm">View Receipt</a>
+      <a href="/assets/uploads/<?= h($app['receipt_filename']) ?>" target="_blank" class="btn-sm">View Receipt</a>
     </div>
   </div>
   <?php endif; ?>

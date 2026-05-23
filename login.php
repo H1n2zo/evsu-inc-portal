@@ -3,7 +3,7 @@
 require_once __DIR__ . '/includes/auth.php';
 
 if (!empty($_SESSION['user_id'])) {
-    header('Location: /evsu_inc_portal/index.php'); exit;
+    header('Location: /index.php'); exit;
 }
 
 $type  = ($_GET['type'] ?? 'employee') === 'student' ? 'student' : 'employee';
@@ -17,9 +17,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $result = attemptLogin($username, $password);
         if ($result['success']) {
             $at = $_SESSION['account_type'];
-            if ($at === 'admin') header('Location: /evsu_inc_portal/admin/dashboard.php');
-            elseif ($at === 'employee') header('Location: /evsu_inc_portal/employee/dashboard.php');
-            else header('Location: /evsu_inc_portal/student/dashboard.php');
+            if ($at === 'admin') header('Location: /admin/dashboard.php');
+            elseif ($at === 'employee') header('Location: /employee/dashboard.php');
+            else header('Location: /student/dashboard.php');
             exit;
         } else {
             $error = $result['error'];
@@ -41,7 +41,7 @@ include __DIR__ . '/includes/head.php';
 
   <div class="login-body">
     <div style="width:100%;max-width:420px;">
-      <a href="/evsu_inc_portal/index.php" class="back-link">← Back to home</a>
+      <a href="/index.php" class="back-link">← Back to home</a>
 
       <div class="login-card">
         <div class="login-card-header">
@@ -69,11 +69,11 @@ include __DIR__ . '/includes/head.php';
 
         <?php if ($type === 'student'): ?>
         <p style="font-size:12px;color:var(--gray-400);text-align:center;margin-top:1.25rem;">
-          Don't have an account? <a href="/evsu_inc_portal/register.php" style="color:var(--maroon);font-weight:500;">Register here</a>
+          Don't have an account? <a href="/register.php" style="color:var(--maroon);font-weight:500;">Register here</a>
         </p>
         <?php else: ?>
         <p style="font-size:12px;color:var(--gray-400);text-align:center;margin-top:1.25rem;">
-          New employee? <a href="/evsu_inc_portal/register.php?type=employee" style="color:var(--maroon);font-weight:500;">Request an account</a>
+          New employee? <a href="/register.php?type=employee" style="color:var(--maroon);font-weight:500;">Request an account</a>
         </p>
         <?php endif; ?>
       </div>

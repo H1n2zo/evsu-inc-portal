@@ -3,7 +3,7 @@
 require_once __DIR__ . '/../includes/auth.php';
 requireLogin();
 if ($_SESSION['account_type'] !== 'student') {
-    header('Location: /evsu_inc_portal/index.php'); exit;
+    header('Location: /index.php'); exit;
 }
 
 $pdo = getDB();
@@ -32,13 +32,13 @@ include __DIR__ . '/../includes/head.php';
 <main class="main-content">
   <div class="top-bar">
     <div><h2>My Dashboard</h2><p>Welcome, <?= h($_SESSION['full_name']) ?></p></div>
-    <a href="/evsu_inc_portal/student/apply.php" class="btn-primary" style="height:36px;">+ New Application</a>
+    <a href="/student/apply.php" class="btn-primary" style="height:36px;">+ New Application</a>
   </div>
 
   <?php foreach ($needsPayment as $np): ?>
   <div class="alert alert-gold">
     ⚠ <strong>Action Required:</strong> Application <strong><?= h($np['app_code']) ?></strong> is waiting for your payment receipt upload.
-    <a href="/evsu_inc_portal/student/upload_receipt.php?id=<?= $np['id'] ?>" style="color:inherit;font-weight:700;margin-left:8px;">Upload Now →</a>
+    <a href="/student/upload_receipt.php?id=<?= $np['id'] ?>" style="color:inherit;font-weight:700;margin-left:8px;">Upload Now →</a>
   </div>
   <?php endforeach; ?>
 
@@ -50,12 +50,12 @@ include __DIR__ . '/../includes/head.php';
   </div>
 
   <div class="content-card">
-    <div class="card-head"><h3>My Applications</h3><a href="/evsu_inc_portal/student/applications.php" class="btn-sm">View all</a></div>
+    <div class="card-head"><h3>My Applications</h3><a href="/student/applications.php" class="btn-sm">View all</a></div>
     <div class="card-body" style="padding:0;">
       <?php if (empty($recent)): ?>
         <div class="empty-state">
           <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-          <p>No applications yet. <a href="/evsu_inc_portal/student/apply.php" style="color:var(--maroon);">File one now →</a></p>
+          <p>No applications yet. <a href="/student/apply.php" style="color:var(--maroon);">File one now →</a></p>
         </div>
       <?php else: ?>
       <table class="data-table">
@@ -75,9 +75,9 @@ include __DIR__ . '/../includes/head.php';
           <td style="color:var(--gray-400);font-size:12px;"><?= date('M d, Y', strtotime($r['updated_at'])) ?></td>
           <td>
             <?php if ($r['current_step']==4 && $r['status']==='pending_payment'): ?>
-            <a href="/evsu_inc_portal/student/upload_receipt.php?id=<?= $r['id'] ?>" class="btn-sm maroon">Upload Receipt</a>
+            <a href="/student/upload_receipt.php?id=<?= $r['id'] ?>" class="btn-sm maroon">Upload Receipt</a>
             <?php else: ?>
-            <a href="/evsu_inc_portal/student/application_view.php?id=<?= $r['id'] ?>" class="btn-sm">View</a>
+            <a href="/student/application_view.php?id=<?= $r['id'] ?>" class="btn-sm">View</a>
             <?php endif; ?>
           </td>
         </tr>

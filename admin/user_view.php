@@ -9,7 +9,7 @@ $stmt = $pdo->prepare("SELECT u.*, GROUP_CONCAT(r.role_name SEPARATOR ',') as ro
     FROM users u LEFT JOIN user_roles ur ON ur.user_id=u.id AND u.account_type='employee'
     LEFT JOIN roles r ON ur.role_id=r.id WHERE u.id=? GROUP BY u.id");
 $stmt->execute([$uid]); $user = $stmt->fetch();
-if (!$user) { header('Location: /evsu_inc_portal/admin/users.php'); exit; }
+if (!$user) { header('Location: /admin/users.php'); exit; }
 
 // Applications for this user (if student)
 $apps = [];
@@ -27,7 +27,7 @@ include __DIR__ . '/../includes/head.php';
 <main class="main-content">
   <div class="top-bar">
     <div><h2><?= h($user['full_name']) ?></h2><p><?= h($user['username']) ?> · <?= ucfirst($user['account_type']) ?></p></div>
-    <a href="/evsu_inc_portal/admin/users.php" class="btn-sm">← Back to Users</a>
+    <a href="/admin/users.php" class="btn-sm">← Back to Users</a>
   </div>
 
   <div style="display:grid;grid-template-columns:320px 1fr;gap:1.25rem;align-items:start;">
@@ -74,7 +74,7 @@ include __DIR__ . '/../includes/head.php';
             <td style="font-size:12px;">Step <?= $a['current_step'] ?></td>
             <td><span class="badge <?= $bm[$a['status']]??'badge-gray' ?>"><?= $lm[$a['status']]??ucfirst($a['status']) ?></span></td>
             <td style="color:var(--gray-400);font-size:12px;"><?= date('M d, Y',strtotime($a['created_at'])) ?></td>
-            <td><a href="/evsu_inc_portal/admin/application_view.php?id=<?= $a['id'] ?>" class="btn-sm">View</a></td>
+            <td><a href="/admin/application_view.php?id=<?= $a['id'] ?>" class="btn-sm">View</a></td>
           </tr>
           <?php endforeach; ?>
           </tbody>

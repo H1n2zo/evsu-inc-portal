@@ -126,7 +126,7 @@ include __DIR__ . '/../includes/head.php';
 
     <div style="display:flex;gap:0.75rem;">
       <button type="submit" class="btn-primary">Save Settings</button>
-      <a href="/evsu_inc_portal/admin/dashboard.php" class="btn-sm" style="height:42px;padding:0 1.25rem;">Cancel</a>
+      <a href="/admin/dashboard.php" class="btn-sm" style="height:42px;padding:0 1.25rem;">Cancel</a>
     </div>
   </form>
 </main>

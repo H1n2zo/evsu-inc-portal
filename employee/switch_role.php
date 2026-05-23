@@ -9,5 +9,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Role not assigned — silently redirect
     }
 }
-header('Location: /evsu_inc_portal/employee/dashboard.php');
+header('Location: /employee/dashboard.php');
 exit;

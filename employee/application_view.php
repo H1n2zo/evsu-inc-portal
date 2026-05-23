@@ -21,7 +21,7 @@ $stmt = $pdo->prepare("SELECT a.*, u.full_name, u.username, u.email, u.student_i
 $stmt->execute([$appId]);
 $app = $stmt->fetch();
 
-if (!$app) { header('Location: /evsu_inc_portal/employee/applications.php'); exit; }
+if (!$app) { header('Location: /employee/applications.php'); exit; }
 
 // Access control: only allow relevant roles to view/act
 $canView = false;
@@ -218,7 +218,7 @@ include __DIR__ . '/../includes/head.php';
           <div><span class="role-chip rc-student">Student</span></div>
           <div style="margin-top:4px;color:var(--gray-600);">O.R. No.: <strong><?= h($app['or_number']) ?></strong></div>
           <?php if ($app['receipt_filename']): ?>
-          <a href="/evsu_inc_portal/assets/uploads/<?= h($app['receipt_filename']) ?>" target="_blank" class="btn-sm" style="margin-top:6px;">View Receipt</a>
+          <a href="/assets/uploads/<?= h($app['receipt_filename']) ?>" target="_blank" class="btn-sm" style="margin-top:6px;">View Receipt</a>
           <?php endif; ?>
         </div>
         <?php endif; ?>
@@ -348,11 +348,11 @@ include __DIR__ . '/../includes/head.php';
           <p class="form-section-title">Uploaded Receipt</p>
           <?php if ($app['receipt_filename']): ?>
           <div style="border:1px solid var(--gray-200);border-radius:var(--radius-sm);overflow:hidden;">
-            <img src="/evsu_inc_portal/assets/uploads/<?= h($app['receipt_filename']) ?>"
+            <img src="/assets/uploads/<?= h($app['receipt_filename']) ?>"
                  style="width:100%;max-height:340px;object-fit:contain;background:var(--gray-100);"
                  alt="Receipt">
           </div>
-          <a href="/evsu_inc_portal/assets/uploads/<?= h($app['receipt_filename']) ?>" target="_blank" class="btn-sm" style="margin-top:8px;">Open Full Size</a>
+          <a href="/assets/uploads/<?= h($app['receipt_filename']) ?>" target="_blank" class="btn-sm" style="margin-top:8px;">Open Full Size</a>
           <?php else: ?>
           <div style="border:1px dashed var(--gray-200);border-radius:var(--radius-sm);padding:3rem;text-align:center;color:var(--gray-400);">No receipt uploaded yet.</div>
           <?php endif; ?>

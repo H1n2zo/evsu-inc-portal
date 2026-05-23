@@ -61,7 +61,7 @@ include __DIR__ . '/../includes/head.php';
     <div class="filter-bar">
       <input class="form-input" type="text" name="q" placeholder="Search student, app code, subject…" value="<?= h($search) ?>">
       <button type="submit" class="btn-sm maroon">Search</button>
-      <a href="/evsu_inc_portal/admin/applications.php" class="btn-sm">Clear</a>
+      <a href="/admin/applications.php" class="btn-sm">Clear</a>
     </div>
   </form>
 
@@ -89,7 +89,7 @@ include __DIR__ . '/../includes/head.php';
           <td style="font-size:12px;">Step <?= $a['current_step'] ?> — <?= $stepLabels[$a['current_step']]??'' ?></td>
           <td><span class="badge <?= $badgeMap2[$a['status']]??'badge-gray' ?>"><?= $labelMap2[$a['status']]??ucfirst($a['status']) ?></span></td>
           <td style="color:var(--gray-400);font-size:12px;"><?= date('M d, Y', strtotime($a['created_at'])) ?></td>
-          <td><a href="/evsu_inc_portal/admin/application_view.php?id=<?= $a['id'] ?>" class="btn-sm">View</a></td>
+          <td><a href="/admin/application_view.php?id=<?= $a['id'] ?>" class="btn-sm">View</a></td>
         </tr>
         <?php endforeach; ?>
         </tbody>

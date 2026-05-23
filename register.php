@@ -1,7 +1,7 @@
 <?php
 // register.php
 require_once __DIR__ . '/includes/auth.php';
-if (!empty($_SESSION['user_id'])) { header('Location: /evsu_inc_portal/index.php'); exit; }
+if (!empty($_SESSION['user_id'])) { header('Location: /index.php'); exit; }
 
 $type = ($_GET['type'] ?? 'student') === 'employee' ? 'employee' : 'student';
 $error = ''; $success = '';
@@ -57,7 +57,7 @@ include __DIR__ . '/includes/head.php';
   </header>
   <div class="login-body">
     <div style="width:100%;max-width:460px;">
-      <a href="/evsu_inc_portal/login.php?type=<?= $type ?>" class="back-link">← Back to login</a>
+      <a href="/login.php?type=<?= $type ?>" class="back-link">← Back to login</a>
       <div class="login-card">
         <div class="login-card-header">
           <div class="login-emblem">E</div>
@@ -67,7 +67,7 @@ include __DIR__ . '/includes/head.php';
 
         <?php if ($success): ?>
           <div class="alert alert-success"><?= h($success) ?></div>
-          <a href="/evsu_inc_portal/login.php?type=<?= $type ?>" class="btn-primary full">Go to Sign In</a>
+          <a href="/login.php?type=<?= $type ?>" class="btn-primary full">Go to Sign In</a>
         <?php else: ?>
         <?php if ($error): ?>
           <div class="alert alert-danger"><?= h($error) ?></div>

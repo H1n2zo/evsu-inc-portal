@@ -139,7 +139,7 @@ include __DIR__ . '/../includes/head.php';
           <td style="color:var(--gray-400);font-size:12px;"><?= h($u['username']) ?></td>
           <td><div class="role-chips"><?php foreach ($roles as $r): ?><span class="role-chip rc-<?= h($r) ?>"><?= h(str_replace('_','. ',ucfirst($r))) ?></span><?php endforeach; ?></div></td>
           <td><strong><?= $u['role_count'] ?></strong> roles</td>
-          <td><a href="/evsu_inc_portal/admin/users.php" class="btn-sm">Edit Roles</a></td>
+          <td><a href="/admin/users.php" class="btn-sm">Edit Roles</a></td>
         </tr>
         <?php endforeach; ?>
         </tbody>
@@ -152,7 +152,7 @@ include __DIR__ . '/../includes/head.php';
   <div class="content-card">
     <div class="card-head">
       <h3>All Employee Role Assignments</h3>
-      <a href="/evsu_inc_portal/admin/users.php" class="btn-sm maroon">Manage Roles</a>
+      <a href="/admin/users.php" class="btn-sm maroon">Manage Roles</a>
     </div>
     <div class="card-body" style="padding:0;">
       <?php if (empty($empRoles)): ?>

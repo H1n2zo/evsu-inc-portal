@@ -66,7 +66,7 @@ include __DIR__ . '/../includes/head.php';
         <option value="rejected" <?= $status==='rejected'?'selected':'' ?>>Rejected</option>
       </select>
       <button type="submit" class="btn-sm maroon">Filter</button>
-      <a href="/evsu_inc_portal/employee/applications.php" class="btn-sm">Clear</a>
+      <a href="/employee/applications.php" class="btn-sm">Clear</a>
     </div>
   </form>
 
@@ -100,7 +100,7 @@ include __DIR__ . '/../includes/head.php';
             if ($activeRole==='instructor' && $a['current_step']==2 && $a['status']==='in_progress') $canAct=true;
             if ($activeRole==='dept_head'  && $a['current_step']==3 && $a['status']==='in_progress') $canAct=true;
             if ($activeRole==='registrar'  && in_array($a['current_step'],[5,6])) $canAct=true;
-            $link = '/evsu_inc_portal/employee/application_view.php?id='.$a['id'];
+            $link = '/employee/application_view.php?id='.$a['id'];
             ?>
             <a href="<?= $link ?>" class="btn-sm <?= $canAct?'maroon':'' ?>"><?= $canAct?'Act Now':'View' ?></a>
           </td>
