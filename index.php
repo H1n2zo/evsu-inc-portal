@@ -1,5 +1,4 @@
 <?php
-// index.php — Landing page (role chooser + login router)
 require_once __DIR__ . '/includes/auth.php';
 
 // If already logged in, redirect to appropriate dashboard
