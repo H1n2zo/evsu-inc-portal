@@ -1,11 +1,4 @@
 <?php
-// controllers/EmployeeAppViewController.php
-// Single Responsibility: Employee single-application view + multi-step workflow actions
-// OOP Concepts:
-//   - Inheritance: extends ApplicationViewerController
-//   - Polymorphism: overrides fetchApp() (role-based access check) and handlePost() (4 workflow actions)
-//   - Encapsulation: each workflow step is a private method
-
 require_once __DIR__ . '/ApplicationViewerController.php';
 
 class EmployeeAppViewController extends ApplicationViewerController
@@ -22,13 +15,15 @@ class EmployeeAppViewController extends ApplicationViewerController
 
         $uid  = $_SESSION['user_id'];
         $role = $_SESSION['active_role'];
-        $ok   = ($role === 'instructor' && $app['instructor_id'] == $uid)
-             || ($role === 'dept_head'  && $app['dept_head_id']  == $uid)
-             ||  $role === 'registrar';
+
+        // Grant access if this employee is assigned to this app in their role
+        $ok = ($role === 'instructor' && (int)$app['instructor_id'] === $uid)
+           || ($role === 'dept_head'  && (int)$app['dept_head_id']  === $uid)
+           ||  $role === 'registrar';
 
         if (!$ok) {
-            http_response_code(403);
-            die('<div style="font-family:sans-serif;padding:2rem;color:#6B0F1A;">403 — Access Denied.</div>');
+            // Redirect instead of hard 403 so the instructor sees a clear message
+            $this->redirect('employee/applications.php');
         }
         return $app;
     }
@@ -38,7 +33,6 @@ class EmployeeAppViewController extends ApplicationViewerController
         return 'employee/application_view';
     }
 
-    // Polymorphic override: routes to the correct workflow step based on role + action
     protected function handlePost(array &$app): string
     {
         $this->guard->verifyCsrf();
@@ -46,22 +40,26 @@ class EmployeeAppViewController extends ApplicationViewerController
         $uid    = $_SESSION['user_id'];
         $role   = $_SESSION['active_role'];
 
-        if ($action === 'instructor_sign' && $role === 'instructor' && $app['current_step'] == 2) {
+        // Step 2: instructor enters grade and signs
+        if ($action === 'instructor_sign' && $role === 'instructor' && (int)$app['current_step'] === 2) {
             return $this->instructorSign($app, $uid);
         }
-        if (in_array($action, ['depthead_approve', 'depthead_reject']) && $role === 'dept_head' && $app['current_step'] == 3) {
+        // Step 3: dept head approves or rejects
+        if (in_array($action, ['depthead_approve', 'depthead_reject']) && $role === 'dept_head' && (int)$app['current_step'] === 3) {
             return $this->deptHeadReview($app, $action, $uid);
         }
-        if (in_array($action, ['registrar_verify', 'registrar_reject_or']) && $role === 'registrar' && $app['current_step'] == 5) {
+        // Step 5: registrar verifies OR
+        if (in_array($action, ['registrar_verify', 'registrar_reject_or']) && $role === 'registrar' && (int)$app['current_step'] === 5) {
             return $this->registrarVerify($app, $action, $uid);
         }
-        if ($action === 'post_grade' && $role === 'registrar' && $app['current_step'] == 6) {
+        // Step 6: registrar posts grade
+        if ($action === 'post_grade' && $role === 'registrar' && (int)$app['current_step'] === 6) {
             return $this->postGrade($app, $uid);
         }
         return '';
     }
 
-    // ── Workflow step handlers — each is an UPDATE on inc_applications ──
+    // ── Step 2 → 3: Instructor enters grade and signs ──────────────
 
     private function instructorSign(array $app, int $uid): string
     {
@@ -69,21 +67,23 @@ class EmployeeAppViewController extends ApplicationViewerController
         $remarks = trim($_POST['remarks'] ?? '');
         $sig     = $_POST['signature_data'] ?? '';
 
-        if (!$grade)                      return 'error:Please enter the resolved final grade.';
-        if (!$sig || strlen($sig) < 50)   return 'error:Please provide your e-signature.';
+        if (!$grade)                    return 'error:Please enter the resolved final grade.';
+        if (!$sig || strlen($sig) < 50) return 'error:Please provide your e-signature.';
 
         $this->apps->updateStep($app['id'], [
             'instructor_grade'     => $grade,
             'instructor_remarks'   => $remarks,
             'instructor_signature' => $sig,
             'instructor_signed_at' => date('Y-m-d H:i:s'),
-            'current_step'         => 3,
+            'current_step'         => 3,   // advance to dept head review
             'status'               => 'in_progress',
         ]);
         $this->logs->write($uid, $_SESSION['username'], 'instructor',
             'Grade Input + E-Sign', "App {$app['app_code']} — Grade: $grade", $_SERVER['REMOTE_ADDR'] ?? '');
         return 'Grade entered and signed. Application forwarded to Department Head.';
     }
+
+    // ── Step 3 → 4 or rejected: Dept Head review ───────────────────
 
     private function deptHeadReview(array $app, string $action, int $uid): string
     {
@@ -120,6 +120,8 @@ class EmployeeAppViewController extends ApplicationViewerController
         }
     }
 
+    // ── Step 5 → 6 or rejected: Registrar verifies OR ──────────────
+
     private function registrarVerify(array $app, string $action, int $uid): string
     {
         $remarks = trim($_POST['remarks'] ?? '');
@@ -150,6 +152,8 @@ class EmployeeAppViewController extends ApplicationViewerController
             return 'O.R. rejected. Student notified to resubmit.';
         }
     }
+
+    // ── Step 6 → 7 resolved: Registrar posts grade ─────────────────
 
     private function postGrade(array $app, int $uid): string
     {

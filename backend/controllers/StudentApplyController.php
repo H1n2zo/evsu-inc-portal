@@ -1,10 +1,7 @@
 <?php
 // controllers/StudentApplyController.php
 // Logic Layer — handle the new INC application form: CREATE
-// OOP Concepts:
-//   - Inheritance: extends Controller
-//   - Composition: ApplicationModel, UserModel, ModuleModel, SettingsModel injected
-//   - Encapsulation: validation and creation are private methods
+// Fix: instructor_id and dept_head_id are now REQUIRED fields
 
 require_once __DIR__ . '/../core/Controller.php';
 require_once __DIR__ . '/../core/AuthGuard.php';
@@ -31,7 +28,7 @@ class StudentApplyController extends Controller
         $this->users    = new UserModel();
         $this->logs     = new AuditLogModel();
         $this->modules  = new ModuleModel();
-        $this->settings = new SettingsModel();   // instance — no static calls
+        $this->settings = new SettingsModel();
     }
 
     public function run(): void
@@ -58,7 +55,6 @@ class StudentApplyController extends Controller
         ]);
     }
 
-    // CREATE: submit a new INC application
     private function handleCreate(): string
     {
         $this->guard->verifyCsrf();
@@ -67,7 +63,6 @@ class StudentApplyController extends Controller
         $subject_code  = trim($_POST['subject_code'] ?? '');
         $units         = (int)($_POST['units'] ?? 3);
         $semester      = $_POST['semester'] ?? '2nd';
-        // Use instance method — no static call
         $school_year   = $this->settings->get('school_year')
                          ?? date('Y') . '-' . (date('Y') + 1);
         $instructor_id = (int)($_POST['instructor_id'] ?? 0);
@@ -78,6 +73,13 @@ class StudentApplyController extends Controller
         }
         if ($units < 1 || $units > 6) {
             return 'Units must be between 1 and 6.';
+        }
+        // Both instructor and dept head are now required so the workflow can proceed
+        if (!$instructor_id) {
+            return 'Please select an instructor.';
+        }
+        if (!$dept_head_id) {
+            return 'Please select a department head.';
         }
         if ($this->apps->isDuplicate($uid, $subject_code, $semester, $school_year)) {
             return "An active application for $subject_code this semester already exists.";

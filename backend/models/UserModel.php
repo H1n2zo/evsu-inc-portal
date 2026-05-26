@@ -9,11 +9,13 @@ require_once __DIR__ . '/../core/Model.php';
 
 class UserModel extends Model
 {
-    // Private: encapsulate raw query
+    // Private: find by username OR student_id
     private function findByUsername(string $username): array|false
     {
-        $stmt = $this->getDb()->prepare("SELECT * FROM users WHERE username = ? LIMIT 1");
-        $stmt->execute([$username]);
+        $stmt = $this->getDb()->prepare(
+            "SELECT * FROM users WHERE username = ? OR student_id = ? LIMIT 1"
+        );
+        $stmt->execute([$username, $username]);
         return $stmt->fetch();
     }
 
@@ -121,7 +123,7 @@ class UserModel extends Model
             WHERE r.role_name='dept_head' AND u.status='active' ORDER BY u.full_name")->fetchAll();
     }
 
-    // Used by AuthService — encapsulated password check
+    // Used by AuthService — checks username OR student_id, then verifies password
     public function authenticate(string $username, string $password): array|false
     {
         $user = $this->findByUsername($username);
