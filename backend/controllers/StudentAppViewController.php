@@ -5,9 +5,24 @@
 // FIX: or_number is now saved in updateStep(); file input name is 'payment_receipt'
 
 require_once __DIR__ . '/ApplicationViewerController.php';
+require_once __DIR__ . '/../core/AppMailer.php';
+require_once __DIR__ . '/../models/UserModel.php';
+require_once __DIR__ . '/../models/ModuleModel.php';
 
 class StudentAppViewController extends ApplicationViewerController
 {
+    private AppMailer   $mailer;
+    private UserModel   $users;
+    private ModuleModel $modules;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->mailer  = new AppMailer();
+        $this->users   = new UserModel();
+        $this->modules = new ModuleModel();
+    }
+
     protected function authorize(): void
     {
         $this->guard->requireStudent();
@@ -49,7 +64,6 @@ class StudentAppViewController extends ApplicationViewerController
         $file    = $_FILES['payment_receipt'];
         $allowed = ['image/jpeg', 'image/png', 'application/pdf'];
 
-        // Some browsers send 'image/jpg' — normalise
         $mime = $file['type'];
         if (!in_array($mime, $allowed)) {
             return 'error:Only JPG, PNG, or PDF files are accepted.';
@@ -63,12 +77,9 @@ class StudentAppViewController extends ApplicationViewerController
         $ext       = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
         $filename  = 'receipt_' . $app['app_code'] . '_' . time() . '.' . $ext;
 
-        // Correct path: backend/controllers/../../frontend/assets/uploads/
-        // = htdocs/frontend/assets/uploads/  (same folder asset() serves)
         $uploadDir = __DIR__ . '/../../frontend/assets/uploads/';
         $dest      = $uploadDir . $filename;
 
-        // Create the directory if it somehow doesn't exist yet
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0755, true);
         }
@@ -77,7 +88,6 @@ class StudentAppViewController extends ApplicationViewerController
             return 'error:Upload failed. Please check folder permissions on frontend/assets/uploads/';
         }
 
-        // FIX: or_number is now persisted alongside the receipt
         $this->apps->updateStep($app['id'], [
             'or_number'           => $orNumber,
             'receipt_filename'    => $filename,
@@ -90,6 +100,24 @@ class StudentAppViewController extends ApplicationViewerController
             'Payment Uploaded',
             "App {$app['app_code']} — O.R. {$orNumber}",
             $_SERVER['REMOTE_ADDR'] ?? '');
+
+        // Notify all active registrars that a receipt is waiting for verification
+        if ($this->modules->isEnabled('email_notif')) {
+            $appWithOr = array_merge($app, [
+                'or_number'        => $orNumber,
+                'receipt_filename' => $filename,
+            ]);
+            $registrars = $this->users->getAll(['role' => 'registrar']);
+            foreach ($registrars as $reg) {
+                // Only notify active registrar accounts
+                if (($reg['status'] ?? '') !== 'active') continue;
+                $this->mailer->notifyReceiptUploaded(
+                    $appWithOr,
+                    $reg['email'],
+                    $reg['full_name']
+                );
+            }
+        }
 
         return 'Payment receipt uploaded successfully. Your application is now under verification.';
     }

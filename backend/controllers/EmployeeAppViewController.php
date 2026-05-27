@@ -5,9 +5,24 @@
 //      advances current_step from 2 → 3.
 
 require_once __DIR__ . '/ApplicationViewerController.php';
+require_once __DIR__ . '/../core/AppMailer.php';
+require_once __DIR__ . '/../models/UserModel.php';
+require_once __DIR__ . '/../models/ModuleModel.php';
 
 class EmployeeAppViewController extends ApplicationViewerController
 {
+    private AppMailer  $mailer;
+    private UserModel  $users;
+    private ModuleModel $modules;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->mailer  = new AppMailer();
+        $this->users   = new UserModel();
+        $this->modules = new ModuleModel();
+    }
+
     protected function authorize(): void
     {
         $this->guard->requireEmployee();
@@ -27,7 +42,6 @@ class EmployeeAppViewController extends ApplicationViewerController
            ||  $role === 'registrar';
 
         if (!$ok) {
-            // Redirect instead of hard 403 so the instructor sees a clear message
             $this->redirect('employee/applications.php');
         }
         return $app;
@@ -64,6 +78,13 @@ class EmployeeAppViewController extends ApplicationViewerController
         return '';
     }
 
+    // ── Helper: only send email when the email_notif module is enabled ──────
+
+    private function emailEnabled(): bool
+    {
+        return $this->modules->isEnabled('email_notif');
+    }
+
     // ── Step 2 → 3: Instructor enters grade and signs ──────────────
 
     private function instructorSign(array $app, int $uid): string
@@ -80,11 +101,26 @@ class EmployeeAppViewController extends ApplicationViewerController
             'instructor_remarks'   => $remarks,
             'instructor_signature' => $sig,
             'instructor_signed_at' => date('Y-m-d H:i:s'),
-            'current_step'         => 3,   // advance to dept head review
+            'current_step'         => 3,
             'status'               => 'in_progress',
         ]);
         $this->logs->write($uid, $_SESSION['username'], 'instructor',
             'Grade Input + E-Sign', "App {$app['app_code']} — Grade: $grade", $_SERVER['REMOTE_ADDR'] ?? '');
+
+        // Notify dept head that grade is ready for review
+        if ($this->emailEnabled()) {
+            $deptHead = $this->users->findById((int)$app['dept_head_id']);
+            if ($deptHead) {
+                // Merge updated grade into app array so the email body shows it
+                $appWithGrade = array_merge($app, ['instructor_grade' => $grade]);
+                $this->mailer->notifyInstructorSigned(
+                    $appWithGrade,
+                    $deptHead['email'],
+                    $deptHead['full_name']
+                );
+            }
+        }
+
         return 'Grade entered and signed. Application forwarded to Department Head.';
     }
 
@@ -107,6 +143,19 @@ class EmployeeAppViewController extends ApplicationViewerController
             ]);
             $this->logs->write($uid, $_SESSION['username'], 'dept_head',
                 'Dept Head Approved', "App {$app['app_code']}", $_SERVER['REMOTE_ADDR'] ?? '');
+
+            // Notify student to submit payment
+            if ($this->emailEnabled()) {
+                $student = $this->users->findById((int)$app['student_id']);
+                if ($student) {
+                    $this->mailer->notifyDeptHeadApproved(
+                        $app,
+                        $student['email'],
+                        $student['full_name']
+                    );
+                }
+            }
+
             return 'Application approved. Student notified to submit payment.';
         } else {
             if (!$remarks) return 'error:Please provide a rejection reason.';
@@ -121,6 +170,21 @@ class EmployeeAppViewController extends ApplicationViewerController
             ]);
             $this->logs->write($uid, $_SESSION['username'], 'dept_head',
                 'Dept Head Rejected', "App {$app['app_code']}: $remarks", $_SERVER['REMOTE_ADDR'] ?? '');
+
+            // Notify student of rejection reason
+            if ($this->emailEnabled()) {
+                $student = $this->users->findById((int)$app['student_id']);
+                if ($student) {
+                    // Merge remarks so the email body can show them
+                    $appWithRemarks = array_merge($app, ['dept_head_remarks' => $remarks]);
+                    $this->mailer->notifyDeptHeadRejected(
+                        $appWithRemarks,
+                        $student['email'],
+                        $student['full_name']
+                    );
+                }
+            }
+
             return 'Application rejected. Student notified.';
         }
     }
@@ -140,6 +204,19 @@ class EmployeeAppViewController extends ApplicationViewerController
             ]);
             $this->logs->write($uid, $_SESSION['username'], 'registrar',
                 'O.R. Verified', "App {$app['app_code']}", $_SERVER['REMOTE_ADDR'] ?? '');
+
+            // Notify student that receipt was verified
+            if ($this->emailEnabled()) {
+                $student = $this->users->findById((int)$app['student_id']);
+                if ($student) {
+                    $this->mailer->notifyOrVerified(
+                        $app,
+                        $student['email'],
+                        $student['full_name']
+                    );
+                }
+            }
+
             return 'O.R. verified. Proceed to grade posting.';
         } else {
             if (!$remarks) return 'error:Please provide a rejection reason.';
@@ -154,6 +231,20 @@ class EmployeeAppViewController extends ApplicationViewerController
             ]);
             $this->logs->write($uid, $_SESSION['username'], 'registrar',
                 'O.R. Rejected', "App {$app['app_code']}: $remarks", $_SERVER['REMOTE_ADDR'] ?? '');
+
+            // Notify student that receipt was rejected
+            if ($this->emailEnabled()) {
+                $student = $this->users->findById((int)$app['student_id']);
+                if ($student) {
+                    $appWithRemarks = array_merge($app, ['registrar_remarks' => $remarks]);
+                    $this->mailer->notifyOrRejected(
+                        $appWithRemarks,
+                        $student['email'],
+                        $student['full_name']
+                    );
+                }
+            }
+
             return 'O.R. rejected. Student notified to resubmit.';
         }
     }
@@ -176,6 +267,19 @@ class EmployeeAppViewController extends ApplicationViewerController
         ]);
         $this->logs->write($uid, $_SESSION['username'], 'registrar',
             'Grade Posted', "App {$app['app_code']} — Final grade posted", $_SERVER['REMOTE_ADDR'] ?? '');
+
+        // Notify student that INC is fully resolved
+        if ($this->emailEnabled()) {
+            $student = $this->users->findById((int)$app['student_id']);
+            if ($student) {
+                $this->mailer->notifyResolved(
+                    $app,
+                    $student['email'],
+                    $student['full_name']
+                );
+            }
+        }
+
         return 'Grade posted successfully. Application marked as Resolved.';
     }
 }
