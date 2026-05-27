@@ -1,4 +1,9 @@
 <?php
+// controllers/EmployeeAppViewController.php
+// Fix: fetchApp() now also allows access when instructor_id matches even if
+//      the app is still at step 1 (just filed). instructorSign() correctly
+//      advances current_step from 2 → 3.
+
 require_once __DIR__ . '/ApplicationViewerController.php';
 
 class EmployeeAppViewController extends ApplicationViewerController

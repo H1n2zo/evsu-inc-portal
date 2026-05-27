@@ -1,7 +1,4 @@
 <?php
-// views/student/application_view.php
-// PRESENTATION LAYER — Pure HTML template. No business logic, no DB, no auth.
-// Receives: $pageTitle, $activePage, $csrf, $app, $msg, $error, $stepLabels, $view
 $view->partial('layouts/head', get_defined_vars());
 $stepLabels = $stepLabels ?? [1=>'Student Filing',2=>'Instructor Input',3=>'Dept. Head Review',4=>'Payment Upload',5=>'Registrar Verify',6=>'Grade Posting',7=>'Resolved'];
 ?>
@@ -53,8 +50,21 @@ $stepLabels = $stepLabels ?? [1=>'Student Filing',2=>'Instructor Input',3=>'Dept
       <div class="card-head"><h3>Application Details</h3></div>
       <div class="card-body" style="font-size:13.5px;">
         <table style="width:100%;border-collapse:collapse;">
-          <?php foreach([['Subject',$app['subject_name']],['Subject Code',$app['subject_code']],['Units',$app['units']],['Processing Fee','₱'.number_format($app['processing_fee'],0)],['Semester',$app['semester']],['School Year',$app['school_year']],['Instructor',$app['instructor_name']??'—'],['Dept. Head',$app['depthead_name']??'—'],['Filed',date('M d, Y',strtotime($app['created_at']))]] as [$l,$v]): ?>
-          <tr><td style="color:var(--gray-400);padding:5px 0;width:45%;"><?= $l ?></td><td style="padding:5px 0;font-weight:500;"><?= $view->e($v) ?></td></tr>
+          <?php foreach([
+            ['Subject',       $app['subject_name']],
+            ['Subject Code',  $app['subject_code']],
+            ['Units',         $app['units']],
+            ['Processing Fee','₱'.number_format($app['processing_fee'],0)],
+            ['Semester',      $app['semester']],
+            ['School Year',   $app['school_year']],
+            ['Instructor',    $app['instructor_name']??'—'],
+            ['Dept. Head',    $app['depthead_name']??'—'],
+            ['Filed',         date('M d, Y',strtotime($app['created_at']))],
+          ] as [$l,$v]): ?>
+          <tr>
+            <td style="color:var(--gray-400);padding:5px 0;width:45%;"><?= $l ?></td>
+            <td style="padding:5px 0;font-weight:500;"><?= $view->e($v) ?></td>
+          </tr>
           <?php endforeach; ?>
         </table>
       </div>
@@ -69,7 +79,9 @@ $stepLabels = $stepLabels ?? [1=>'Student Filing',2=>'Instructor Input',3=>'Dept
           <span class="role-chip rc-instructor">Instructor</span>
           <div style="margin-top:4px;">Grade entered: <strong><?= $view->e($app['instructor_grade']??'—') ?></strong></div>
           <div style="font-size:11.5px;color:var(--gray-400);margin-top:2px;"><?= date('M d, Y', strtotime($app['instructor_signed_at'])) ?></div>
-          <?php if ($app['instructor_signature']): ?><img src="<?= $app['instructor_signature'] ?>" style="max-height:35px;border:1px solid var(--gray-200);border-radius:4px;margin-top:4px;"><?php endif; ?>
+          <?php if ($app['instructor_signature']): ?>
+          <img src="<?= $app['instructor_signature'] ?>" style="max-height:35px;border:1px solid var(--gray-200);border-radius:4px;margin-top:4px;">
+          <?php endif; ?>
         </div>
         <?php endif; ?>
 
@@ -78,7 +90,9 @@ $stepLabels = $stepLabels ?? [1=>'Student Filing',2=>'Instructor Input',3=>'Dept
           <span class="role-chip rc-dept_head">Dept. Head</span>
           <div style="margin-top:4px;">Decision: <strong style="color:<?= $app['dept_head_action']==='approved'?'var(--success)':'var(--danger)' ?>"><?= ucfirst($app['dept_head_action']??'—') ?></strong></div>
           <div style="font-size:11.5px;color:var(--gray-400);margin-top:2px;"><?= date('M d, Y', strtotime($app['dept_head_signed_at'])) ?></div>
-          <?php if ($app['dept_head_signature']): ?><img src="<?= $app['dept_head_signature'] ?>" style="max-height:35px;border:1px solid var(--gray-200);border-radius:4px;margin-top:4px;"><?php endif; ?>
+          <?php if ($app['dept_head_signature']): ?>
+          <img src="<?= $app['dept_head_signature'] ?>" style="max-height:35px;border:1px solid var(--gray-200);border-radius:4px;margin-top:4px;">
+          <?php endif; ?>
         </div>
         <?php endif; ?>
 
@@ -87,7 +101,9 @@ $stepLabels = $stepLabels ?? [1=>'Student Filing',2=>'Instructor Input',3=>'Dept
           <span class="role-chip rc-registrar">Registrar</span>
           <div style="margin-top:4px;color:var(--success);font-weight:600;">✓ Grade Posted — Application Resolved</div>
           <div style="font-size:11.5px;color:var(--gray-400);margin-top:2px;"><?= date('M d, Y', strtotime($app['registrar_signed_at'])) ?></div>
-          <?php if ($app['registrar_signature']): ?><img src="<?= $app['registrar_signature'] ?>" style="max-height:35px;border:1px solid var(--gray-200);border-radius:4px;margin-top:4px;"><?php endif; ?>
+          <?php if ($app['registrar_signature']): ?>
+          <img src="<?= $app['registrar_signature'] ?>" style="max-height:35px;border:1px solid var(--gray-200);border-radius:4px;margin-top:4px;">
+          <?php endif; ?>
         </div>
         <?php endif; ?>
 
@@ -97,11 +113,19 @@ $stepLabels = $stepLabels ?? [1=>'Student Filing',2=>'Instructor Input',3=>'Dept
         <?php if ($app['current_step'] == 3 && !$app['dept_head_signed_at']): ?>
         <div style="color:var(--gray-400);font-size:13px;">⏳ Waiting for department head review…</div>
         <?php endif; ?>
+        <?php if ($app['current_step'] == 4 && $app['status'] === 'pending_payment'): ?>
+        <div style="color:var(--gray-400);font-size:13px;">⏳ Waiting for your payment receipt upload…</div>
+        <?php endif; ?>
+        <?php if ($app['current_step'] == 5): ?>
+        <div style="color:var(--gray-400);font-size:13px;">⏳ Waiting for registrar to verify your receipt…</div>
+        <?php endif; ?>
       </div>
     </div>
   </div>
 
   <!-- Payment upload (Step 4) -->
+  <!-- FIX 1: action now includes ?id= so $_GET['id'] is available on POST -->
+  <!-- FIX 2: file input name is 'payment_receipt' to match StudentAppViewController -->
   <?php if ($app['current_step'] == 4 && $app['status'] === 'pending_payment'): ?>
   <div class="content-card" style="max-width:600px;">
     <div class="card-head"><h3>Step 4 — Upload Payment Receipt</h3></div>
@@ -109,16 +133,21 @@ $stepLabels = $stepLabels ?? [1=>'Student Filing',2=>'Instructor Input',3=>'Dept
       <div class="alert alert-gold" style="margin-bottom:1rem;">
         Please pay <strong>₱<?= number_format($app['processing_fee'],0) ?></strong> at the cashier and upload your Official Receipt below.
       </div>
-      <form method="POST" action="<?= $view->url('student/application_view.php') ?>" enctype="multipart/form-data">
+      <form method="POST"
+            action="<?= $view->url('student/application_view.php') ?>?id=<?= (int)$app['id'] ?>"
+            enctype="multipart/form-data">
         <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
         <input type="hidden" name="action" value="upload_receipt">
         <div class="form-group">
           <label class="form-label">Official Receipt (O.R.) Number <span style="color:var(--danger)">*</span></label>
-          <input class="form-input" type="text" name="or_number" placeholder="Enter the O.R. number on your receipt" required>
+          <input class="form-input" type="text" name="or_number"
+                 placeholder="Enter the O.R. number on your receipt" required>
         </div>
         <div class="form-group">
           <label class="form-label">Upload Receipt File <span style="color:var(--danger)">*</span></label>
-          <input class="form-input" type="file" name="receipt" accept=".jpg,.jpeg,.png,.pdf" required style="height:auto;padding:8px 14px;">
+          <input class="form-input" type="file" name="payment_receipt"
+                 accept=".jpg,.jpeg,.png,.pdf" required
+                 style="height:auto;padding:8px 14px;">
           <p class="form-hint">Accepted: JPG, PNG, PDF — Max <?= ($settingsData['max_upload_mb'] ?? 5) ?>MB</p>
         </div>
         <button type="submit" class="btn-primary">Upload Receipt</button>
@@ -130,7 +159,10 @@ $stepLabels = $stepLabels ?? [1=>'Student Filing',2=>'Instructor Input',3=>'Dept
   <!-- Already uploaded receipt -->
   <?php if ($app['receipt_filename'] && $app['current_step'] >= 5): ?>
   <div class="content-card" style="max-width:500px;">
-    <div class="card-head"><h3>Payment Receipt</h3><span class="badge badge-success">Uploaded</span></div>
+    <div class="card-head">
+      <h3>Payment Receipt</h3>
+      <span class="badge badge-success">Uploaded</span>
+    </div>
     <div class="card-body">
       <p style="font-size:13.5px;margin-bottom:0.75rem;">O.R. No.: <strong><?= $view->e($app['or_number']??'—') ?></strong></p>
       <a href="<?= $view->asset('uploads/') . $view->e($app['receipt_filename']) ?>" target="_blank" class="btn-sm">View Receipt</a>
@@ -140,7 +172,8 @@ $stepLabels = $stepLabels ?? [1=>'Student Filing',2=>'Instructor Input',3=>'Dept
 
   <?php if ($app['status'] === 'resolved'): ?>
   <div class="alert alert-success" style="font-size:14px;">
-    🎉 <strong>Congratulations!</strong> Your INC application has been resolved. Final grade <strong><?= $view->e($app['instructor_grade']??'') ?></strong> has been posted to your record.
+    🎉 <strong>Congratulations!</strong> Your INC application has been resolved.
+    Final grade <strong><?= $view->e($app['instructor_grade']??'') ?></strong> has been posted to your record.
   </div>
   <?php endif; ?>
 

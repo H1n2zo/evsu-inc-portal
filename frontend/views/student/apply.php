@@ -66,7 +66,7 @@ $view->partial('layouts/head', get_defined_vars());
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Instructor</label>
-            <select class="form-input" name="instructor_id">
+            <select class="form-input" name="instructor_id" required>
               <option value="">— Select Instructor —</option>
               <?php foreach ($instructors as $i): ?>
               <option value="<?= $i['id'] ?>"><?= $view->e($i['full_name']) ?><?= $i['department']?' ('.$i['department'].')':'' ?></option>
@@ -76,7 +76,7 @@ $view->partial('layouts/head', get_defined_vars());
           </div>
           <div class="form-group">
             <label class="form-label">Department Head</label>
-            <select class="form-input" name="dept_head_id">
+            <select class="form-input" name="dept_head_id" required>
               <option value="">— Select Dept. Head —</option>
               <?php foreach ($deptHeads as $d): ?>
               <option value="<?= $d['id'] ?>"><?= $view->e($d['full_name']) ?><?= $d['department']?' ('.$d['department'].')':'' ?></option>
