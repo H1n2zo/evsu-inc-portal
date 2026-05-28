@@ -5,6 +5,7 @@
 
 require_once __DIR__ . '/../core/Controller.php';
 require_once __DIR__ . '/../core/AuthGuard.php';
+require_once __DIR__ . '/../core/AppMailer.php';
 require_once __DIR__ . '/../models/ApplicationModel.php';
 require_once __DIR__ . '/../models/UserModel.php';
 require_once __DIR__ . '/../models/ModuleModel.php';
@@ -19,6 +20,7 @@ class StudentApplyController extends Controller
     private AuditLogModel    $logs;
     private ModuleModel      $modules;
     private SettingsModel    $settings;
+    private AppMailer        $mailer;
 
     public function __construct()
     {
@@ -29,6 +31,7 @@ class StudentApplyController extends Controller
         $this->logs     = new AuditLogModel();
         $this->modules  = new ModuleModel();
         $this->settings = new SettingsModel();
+        $this->mailer   = new AppMailer();
     }
 
     public function run(): void
@@ -74,7 +77,6 @@ class StudentApplyController extends Controller
         if ($units < 1 || $units > 6) {
             return 'Units must be between 1 and 6.';
         }
-        // Both instructor and dept head are now required so the workflow can proceed
         if (!$instructor_id) {
             return 'Please select an instructor.';
         }
@@ -98,6 +100,15 @@ class StudentApplyController extends Controller
 
         $this->logs->write($uid, $_SESSION['username'], 'student',
             'Application Filed', "App — $subject_code", $_SERVER['REMOTE_ADDR'] ?? '');
+
+        // Notify instructor that a new INC application has been assigned to them
+        if ($this->modules->isEnabled('email_notif')) {
+            $app        = $this->apps->findById($newId);
+            $instructor = $this->users->findById($instructor_id);
+            if ($app && $instructor) {
+                $this->mailer->notifyApplicationFiled($app, $instructor['email'], $instructor['full_name']);
+            }
+        }
 
         $this->redirect("student/application_view.php?id={$newId}&filed=1");
     }

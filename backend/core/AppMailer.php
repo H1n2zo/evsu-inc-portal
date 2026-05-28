@@ -3,10 +3,6 @@
 // Service Layer — named notification methods for every INC workflow step.
 // Each method corresponds to one state transition in the workflow.
 // Controllers call these after a successful updateStep().
-//
-// Usage example in EmployeeAppViewController:
-//   $mailer = new AppMailer();
-//   $mailer->notifyInstructorSigned($app);
 
 require_once __DIR__ . '/MailerService.php';
 
@@ -17,6 +13,29 @@ class AppMailer
     public function __construct()
     {
         $this->mailer = new MailerService();
+    }
+
+    // ── Step 1 → 2: Student filed application ────────────────────
+    // Notify the assigned instructor that a new INC has been filed.
+    public function notifyApplicationFiled(array $app, string $instructorEmail, string $instructorName): bool
+    {
+        return $this->mailer->send(
+            to:      $instructorEmail,
+            toName:  $instructorName,
+            subject: "[INC Portal] New INC Application Assigned — {$app['app_code']}",
+            body:    "
+                <p>Dear {$instructorName},</p>
+                <p>A student has filed a new INC completion application and assigned it to you for grade entry.</p>
+                <table style='width:100%;border-collapse:collapse;font-size:13px;'>
+                  <tr><td style='padding:6px 0;color:#A09080;width:40%'>Application</td><td style='font-weight:600'>{$app['app_code']}</td></tr>
+                  <tr><td style='padding:6px 0;color:#A09080'>Student</td><td>{$app['full_name']}</td></tr>
+                  <tr><td style='padding:6px 0;color:#A09080'>Subject</td><td>{$app['subject_name']} ({$app['subject_code']})</td></tr>
+                  <tr><td style='padding:6px 0;color:#A09080'>Units</td><td>{$app['units']} units</td></tr>
+                  <tr><td style='padding:6px 0;color:#A09080'>Semester</td><td>{$app['semester']} Semester, {$app['school_year']}</td></tr>
+                </table>
+                <p style='margin-top:24px;'>Please log in to the INC Portal to enter the resolved final grade and apply your e-signature.</p>
+            "
+        );
     }
 
     // ── Step 2 → 3: Instructor signed ────────────────────────────
@@ -104,8 +123,7 @@ class AppMailer
     }
 
     // ── Step 5 → 6: Registrar verified O.R. ──────────────────────
-    // No external email needed — registrar moves to grade posting immediately.
-    // Included for completeness if you want to notify the student.
+    // Notify student that receipt has been verified.
     public function notifyOrVerified(array $app, string $studentEmail, string $studentName): bool
     {
         return $this->mailer->send(
@@ -116,6 +134,7 @@ class AppMailer
                 <p>Dear {$studentName},</p>
                 <p>Your payment receipt for <strong>{$app['app_code']}</strong> has been verified.
                 The registrar will now post your final grade.</p>
+                <p>No further action is required from you at this time.</p>
             "
         );
     }
