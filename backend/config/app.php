@@ -6,7 +6,7 @@ define('BASE_URL', 'https://evsuinc.infinityfreeapp.com');  // no trailing slash
 
 function url(string $path = ''): string
 {
-    $rootFiles = ['index.php', 'login.php', 'logout.php', 'register.php'];
+    $rootFiles = ['index.php', 'login.php', 'logout.php', 'register.php', 'forgot_password.php'];
 
     $clean = ltrim($path, '/');
     $base  = explode('?', $clean)[0];

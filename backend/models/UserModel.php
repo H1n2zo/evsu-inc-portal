@@ -132,4 +132,52 @@ class UserModel extends Model
         }
         return $user;
     }
+
+    public function findByEmail(string $email): array|false
+    {
+        $stmt = $this->getDb()->prepare(
+            "SELECT * FROM users WHERE email = ? LIMIT 1"
+        );
+        $stmt->execute([$email]);
+        return $stmt->fetch();
+    }
+
+    public function clearPasswordResets(string $email): void
+    {
+        $this->getDb()->prepare(
+            "DELETE FROM password_resets WHERE email = ?"
+        )->execute([$email]);
+    }
+
+    public function createPasswordReset(string $email, string $otpHash, string $expiresAt): void
+    {
+        $this->getDb()->prepare(
+            "INSERT INTO password_resets (email, otp_hash, expires_at) VALUES (?, ?, ?)"
+        )->execute([$email, $otpHash, $expiresAt]);
+    }
+
+    public function findValidPasswordReset(string $email): array|false
+    {
+        $stmt = $this->getDb()->prepare(
+            "SELECT * FROM password_resets
+             WHERE email = ? AND used = 0 AND expires_at > NOW()
+             ORDER BY created_at DESC LIMIT 1"
+        );
+        $stmt->execute([$email]);
+        return $stmt->fetch();
+    }
+
+    public function updatePassword(int $id, string $hash): void
+    {
+        $this->getDb()->prepare(
+            "UPDATE users SET password_hash = ? WHERE id = ?"
+        )->execute([$hash, $id]);
+    }
+
+    public function markResetUsed(int $id): void
+    {
+        $this->getDb()->prepare(
+            "UPDATE password_resets SET used = 1 WHERE id = ?"
+        )->execute([$id]);
+    }
 }
